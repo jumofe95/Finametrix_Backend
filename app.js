@@ -3,11 +3,30 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const bodyParser= require('body-parser');
-
 var newsRouterApi = require('./routes/api/news');
 
 var app = express();
+
+const bodyParser= require('body-parser');
+
+//MongoDB connection
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+// Connection URL
+var mongodb_url_short = 'mongodb+srv://julian:wodyjuli95@news-35sq7.mongodb.net/test?retryWrites=true';
+
+// Database Name
+const dbName = 'news';
+
+MongoClient.connect(mongodb_url_short, function(err, client) {
+    assert.equal(null, err);
+    console.log("Connected successfully to MongoDB server");
+
+    const db = client.db(dbName);
+
+    client.close();
+});
 
 
 // view engine setup
