@@ -26,14 +26,16 @@ MongoClient.connect(mongodb_url_short, function(err, client) {
 
 /* GET news. */
 router.get('/all', function (req, res, next) {
-    // Get the documents collection
+    // Get the news collection
     const collection = db.collection('news');
-    collection.toArray(function(err, docs) {
+
+    // Find all news
+    collection.find({}).toArray(function(err, docs) {
         assert.equal(err, null);
         console.log("Found the following records");
         console.log(docs);
-        callback(docs);
 
+        res.send(docs);
     });
 
 });
@@ -44,10 +46,9 @@ router.post('/create', function (req, res, next) {
 
     db.collection('news').save(req.body, function (err, result) {
         if (err) return console.log(err);
-
         console.log('saved to database');
         res.status(200).send('Created successfully!!');
-    })
+    });
 
 });
 
