@@ -20,6 +20,8 @@ MongoClient.connect(mongodb_url_short, function(err, client) {
     db = client.db(dbName);
     //client.close();
 });
+// --- / MongoDB connection ---
+
 
 
 
@@ -32,29 +34,22 @@ router.get('/all', function (req, res, next) {
     // Find all news
     collection.find({}).toArray(function(err, docs) {
         assert.equal(err, null);
-        console.log("Found the following records");
-        console.log(docs);
-
-        res.send(docs);
+        res.status(200).send(docs);
     });
-
 });
 
 /* CREATE news. */
 router.post('/create', function (req, res, next) {
-    console.log(req.body);
-
     db.collection('news').save(req.body, function (err, result) {
         if (err) return console.log(err);
-        console.log('saved to database');
         res.status(200).send('Created successfully!!');
     });
 
 });
 
 /* PUT news to archived. */
-router.put('/archive/{new_id}', function (req, res, next) {
-
+router.put('/archive/:newId', function (req, res, next) {
+    res.send("newId is: " + req.params.newId);
 });
 
 /* GET archived news. */
@@ -63,7 +58,7 @@ router.get('/archived', function (req, res, next) {
 });
 
 /* REMOVE archived news. */
-router.delete('/archived/delete/{new_id}', function (req, res, next) {
+router.delete('/archived/delete/:newId}', function (req, res, next) {
 
 });
 
