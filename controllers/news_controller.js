@@ -39,15 +39,35 @@ const createNew = (req, res, next) => {
 };
 
 
+function formattedCurrentDate() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+        mm = '0' + mm;
+    }
+
+    today = mm + '/' + dd + '/' + yyyy;
+    return today;
+}
+
+
 const archiveNew = (req, res, next) => {
     const collection = db.collection('news');
     const new_id = req.params.newId;
+    const currentDate = formattedCurrentDate();
 
     // Update document where a is 2, set b equal to 1
-    collection.updateOne({id: new_id}, {$set: {b: 1}}, (err, result) => { //TODO: END QUERY
+    collection.updateOne({id: new_id}, {$set: {archiveDate: currentDate}}, (err, result) => { //TODO: END QUERY
             assert.equal(err, null);
             assert.equal(1, result.result.n);
-            console.log("Updated the document with the field a equal to 2");
+
             res.status(200).send('New archived successfully!!');
         });
 
