@@ -20,8 +20,9 @@ MongoClient.connect(mongodb_url_short, (err, client) => {
 
 
 const getAllNews = (req, res, next) => {
+    const collection = db.collection('news');
     // Find all news
-    db.collection('news').find({}).toArray((err, docs) => {
+    collection.find({}).toArray((err, docs) => {
         assert.equal(err, null);
         res.status(200).send(docs);
     });
@@ -29,19 +30,20 @@ const getAllNews = (req, res, next) => {
 
 
 const createNew = (req, res, next) => {
-    db.collection('news').save(req.body, (err, result) => {
+    const collection = db.collection('news');
+    collection.save(req.body, (err, result) => {
         if (err) return console.log(err);
         res.status(200).send('Created successfully!!');
     });
 };
 
-
 const archiveNew = (req, res, next) => {
     const id = req.params.newId;
     var ObjectId = require('mongodb').ObjectID;
 
+    const collection = db.collection('news');
     // Update new with given id, set archiveDate to current date
-    db.collection('news').updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": new Date()}}, (err, result) => {
+    collection.updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": new Date()}}, (err, result) => {
         assert.equal(err, null);
         assert.equal(1, result.result.n);
 
@@ -49,23 +51,30 @@ const archiveNew = (req, res, next) => {
     });
 };
 
-
 const getArchivedNews = (req, res, next) => {
     var sort = {
         archiveDate: 1
     };
-    db.collection('news').find({archiveDate : {$exists:true}}).sort(sort).toArray((err, docs) => {
+    const collection = db.collection('news');
+    collection.find({archiveDate : {$exists:true}}).sort(sort).toArray((err, docs) => {
         assert.equal(err, null);
         res.status(200).send(docs);
     });
 };
 
+const removeNew = (req, res, next) => {
+    const id = req.params.newId;
+    var ObjectId = require('mongodb').ObjectID;
 
-const removeArchivedNew = (req, res, next) => {
-
+    const collection = db.collection('news');
+    collection.deleteOne({ "_id": new ObjectId(id)}, (err, result) => {
+        assert.equal(err, null);
+        assert.equal(1, result.result.n);
+        res.status(200).send('New removed successfully!!');
+    });
 };
 
 
 module.exports = {
-    getAllNews, createNew, archiveNew, getArchivedNews, removeArchivedNew
+    getAllNews, createNew, archiveNew, getArchivedNews, removeNew
 };

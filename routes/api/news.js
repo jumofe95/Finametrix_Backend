@@ -16,7 +16,7 @@ router.put('/:newId/archive', NewsController.archiveNew);
 router.get('/archived', NewsController.getArchivedNews);
 
 /* REMOVE archived news. */
-router.delete('/archived/delete/:newId}', NewsController.removeArchivedNew);
+router.delete('/:newId/delete', NewsController.removeNew);
 
 
 module.exports = router;
