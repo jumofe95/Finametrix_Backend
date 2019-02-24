@@ -60,16 +60,17 @@ function formattedCurrentDate() {
 
 const archiveNew = (req, res, next) => {
     const collection = db.collection('news');
-    const new_id = req.params.newId;
+    const id = req.params.newId;
     const currentDate = formattedCurrentDate();
+    var ObjectId = require('mongodb').ObjectID;
 
     // Update document where a is 2, set b equal to 1
-    collection.updateOne({id: new_id}, {$set: {archiveDate: currentDate}}, (err, result) => { //TODO: END QUERY
-            assert.equal(err, null);
-            assert.equal(1, result.result.n);
+    collection.updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": currentDate}}, (err, result) => {
+        assert.equal(err, null);
+        assert.equal(1, result.result.n);
 
-            res.status(200).send('New archived successfully!!');
-        });
+        res.status(200).send('New archived successfully!!');
+    });
 
 };
 
