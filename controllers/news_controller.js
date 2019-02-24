@@ -20,11 +20,8 @@ MongoClient.connect(mongodb_url_short, (err, client) => {
 
 
 const getAllNews = (req, res, next) => {
-    // Get the news collection
-    const collection = db.collection('news');
-
     // Find all news
-    collection.find({}).toArray((err, docs) => {
+    db.collection('news').find({}).toArray((err, docs) => {
         assert.equal(err, null);
         res.status(200).send(docs);
     });
@@ -39,44 +36,28 @@ const createNew = (req, res, next) => {
 };
 
 
-function formattedCurrentDate() {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1; //January is 0!
-    var yyyy = today.getFullYear();
-
-    if (dd < 10) {
-        dd = '0' + dd;
-    }
-
-    if (mm < 10) {
-        mm = '0' + mm;
-    }
-
-    today = mm + '/' + dd + '/' + yyyy;
-    return today;
-}
-
-
 const archiveNew = (req, res, next) => {
-    const collection = db.collection('news');
     const id = req.params.newId;
-    const currentDate = formattedCurrentDate();
     var ObjectId = require('mongodb').ObjectID;
 
-    // Update document where a is 2, set b equal to 1
-    collection.updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": currentDate}}, (err, result) => {
+    // Update new with given id, set archiveDate to current date
+    db.collection('news').updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": new Date()}}, (err, result) => {
         assert.equal(err, null);
         assert.equal(1, result.result.n);
 
         res.status(200).send('New archived successfully!!');
     });
-
 };
 
 
 const getArchivedNews = (req, res, next) => {
-
+    var sort = {
+        archiveDate: 1
+    };
+    db.collection('news').find({archiveDate : {$exists:true}}).sort(sort).toArray((err, docs) => {
+        assert.equal(err, null);
+        res.status(200).send(docs);
+    });
 };
 
 
