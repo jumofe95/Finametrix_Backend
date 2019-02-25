@@ -22,7 +22,7 @@ MongoClient.connect(mongodb_url_short, (err, client) => {
 const getAllNews = (req, res, next) => {
     const collection = db.collection('news');
     // Find all news
-    collection.find({}).toArray((err, docs) => {
+    collection.find({archiveDate : {$exists:false}}).toArray((err, docs) => {
         assert.equal(err, null);
         res.status(200).send(docs);
     });
