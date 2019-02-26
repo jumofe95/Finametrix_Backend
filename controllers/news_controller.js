@@ -20,20 +20,32 @@ MongoClient.connect(mongodb_url_short, (err, client) => {
 
 
 const getAllNews = (req, res, next) => {
+    var sort = {
+        date: 1
+    };
     const collection = db.collection('news');
     // Find all news
-    collection.find({archiveDate : {$exists:false}}).toArray((err, docs) => {
+    collection.find({archiveDate : {$exists:false}}).sort(sort).toArray((err, result) => {
         assert.equal(err, null);
-        res.status(200).send(docs);
+
+        res.status(200).send(result);
     });
 };
 
-
 const createNew = (req, res, next) => {
+    var new_object = {
+        title: req.body.title,
+        description: req.body.description,
+        content: req.body.content,
+        author: req.body.author,
+        date: new Date(),
+    };
+
     const collection = db.collection('news');
-    collection.save(req.body, (err, result) => {
+    collection.save(new_object, (err, result) => {
         if (err) return console.log(err);
-        res.status(200).send('Created successfully!!');
+
+        res.status(201).send(result.ops[0]); //return the created new for displaying on screen (if required)
     });
 };
 
@@ -47,7 +59,7 @@ const archiveNew = (req, res, next) => {
         assert.equal(err, null);
         assert.equal(1, result.result.n);
 
-        res.status(200).send('New archived successfully!!');
+        res.status(200).send('New archived successfully');
     });
 };
 
@@ -70,7 +82,8 @@ const removeNew = (req, res, next) => {
     collection.deleteOne({ "_id": new ObjectId(id)}, (err, result) => {
         assert.equal(err, null);
         assert.equal(1, result.result.n);
-        res.status(200).send('New removed successfully!!');
+
+        res.status(204).send();
     });
 };
 
