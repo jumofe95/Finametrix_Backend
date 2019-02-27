@@ -1,12 +1,10 @@
-// Cargamos el módulo de mongoose
+// load the mongoose module
 var mongoose =  require('mongoose');
 
-
-// Usaremos los esquemas
+// We will use the schemes
 var Schema = mongoose.Schema;
 
-
-// Creamos el objeto del esquema y sus atributos
+// We create the object and its attributes
 var NewSchema = Schema({
     title: String,
     description: String,
@@ -17,5 +15,5 @@ var NewSchema = Schema({
 });
 
 
-// Exportamos el modelo para usarlo en otros ficheros
+// export the model for use in other files
 module.exports = mongoose.model('New', NewSchema);

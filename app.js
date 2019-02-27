@@ -1,18 +1,16 @@
 var createError = require('http-errors');
 
-// Cargamos los módulos de express y body-parser
+// We load the express and body-parser modules
 var express = require('express');
 var bodyParser = require('body-parser');
 
-
-// Llamamos a express para poder crear el servidor
+// We call express to be able to create the server
 var app = express();
 
-
-// Importamos las rutas
+// import the routes
 var newsRouterApi = require('./routes/api/news');
 
-//importamos cors
+// import the cors for allow a user agent (client) to obtain permission to access the server
 var cors = require('cors');
 
 var path = require('path');
@@ -21,18 +19,18 @@ var path = require('path');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+
+// -- load middlewares --
+
 //implemented CORS Policy
 app.use(cors());
 
-
-//cargar middlewares
-//un metodo que se ejecuta antes que llegue a un controlador
-//Configuramos bodyParser para que convierta el body de nuestras peticiones a JSON
+// configure bodyParser to convert the body of our requests to JSON
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 
-// Cargamos las rutas
+// load the routes
 app.use('/api/news', newsRouterApi);
 
 
@@ -54,6 +52,5 @@ app.use(function(err, req, res, next) {
 });
 
 
-
-// exportamos este módulo para poder usar la variable app fuera de este archivo
+// export this module in order to use the app variable outside of this file
 module.exports = app;
