@@ -1,15 +1,21 @@
 var createError = require('http-errors');
-var express = require('express');
-var cors = require('cors');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var newsRouterApi = require('./routes/api/news');
 
+// Cargamos los módulos de express y body-parser
+var express = require('express');
+var bodyParser = require('body-parser');
+
+
+// Llamamos a express para poder crear el servidor
 var app = express();
 
-const bodyParser= require('body-parser');
 
+// Importamos las rutas
+var newsRouterApi = require('./routes/api/news');
+
+//importamos cors
+var cors = require('cors');
+
+var path = require('path');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -18,19 +24,23 @@ app.set('view engine', 'jade');
 //implemented CORS Policy
 app.use(cors());
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(bodyParser.urlencoded({extended: true}));
+//cargar middlewares
+//un metodo que se ejecuta antes que llegue a un controlador
+//Configuramos bodyParser para que convierta el body de nuestras peticiones a JSON
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json());
+
+
+// Cargamos las rutas
 app.use('/api/news', newsRouterApi);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -44,5 +54,6 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
 
+// exportamos este módulo para poder usar la variable app fuera de este archivo
+module.exports = app;

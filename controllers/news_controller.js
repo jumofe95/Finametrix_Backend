@@ -1,88 +1,62 @@
-// ---- MongoDB connection ----
-const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
+// Cargamos el modelo para usarlo posteriormente
+var New = require('../models/new');
 
-// Connection URL
-const mongodb_url_short = 'mongodb+srv://julian:wodyjuli95@news-35sq7.mongodb.net/test?retryWrites=true';
-
-// Database Name
-const dbName = 'news';
-var db;
-
-// Connect to the server
-MongoClient.connect(mongodb_url_short, (err, client) => {
-    assert.equal(null, err);
-    console.log("Connected successfully to MongoDB server");
-    db = client.db(dbName);
-    //client.close();
-});
-// ---- / MongoDB connection ----
+var mongoose = require('mongoose');
 
 
 const getAllNews = (req, res, next) => {
-    var sort = {
+    const sort = {
         date: 1
     };
-    const collection = db.collection('news');
-    // Find all news
-    collection.find({archiveDate : {$exists:false}}).sort(sort).toArray((err, result) => {
-        assert.equal(err, null);
+    const News = mongoose.model('New');
 
-        res.status(200).send(result);
-    });
+    News.find({archiveDate: {$exists: false}}, null, function (err, docs) {
+        res.status(200).send(docs);
+    }).sort(sort);
 };
 
 const createNew = (req, res, next) => {
-    var new_object = {
-        title: req.body.title,
-        description: req.body.description,
-        content: req.body.content,
-        author: req.body.author,
-        date: new Date(),
-    };
+    var new_object = new New();
+    new_object.title = req.body.title;
+    new_object.description = req.body.description;
+    new_object.content = req.body.content;
+    new_object.author = req.body.author;
+    new_object.date = new Date();
 
-    const collection = db.collection('news');
-    collection.save(new_object, (err, result) => {
-        if (err) return console.log(err);
-
-        res.status(201).send(result.ops[0]); //return the created new for displaying on screen (if required)
+    //const collection = db.collection('news');
+    new_object.save(new_object, (err, result) => {
+        res.status(201).send(result); //return the created new for displaying on screen (if required)
     });
 };
 
 const archiveNew = (req, res, next) => {
     const id = req.params.newId;
-    var ObjectId = require('mongodb').ObjectID;
+    const ObjectId = require('mongodb').ObjectID;
+    const News = mongoose.model('New');
 
-    const collection = db.collection('news');
     // Update new with given id, set archiveDate to current date
-    collection.updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": new Date()}}, (err, result) => {
-        assert.equal(err, null);
-        assert.equal(1, result.result.n);
-
+    News.updateOne({"_id": new ObjectId(id)}, {$set: {"archiveDate": new Date()}}, (err, result) => {
         res.status(200).send('New archived successfully');
     });
 };
 
 const getArchivedNews = (req, res, next) => {
-    var sort = {
+    const sort = {
         archiveDate: 1
     };
-    const collection = db.collection('news');
-    collection.find({archiveDate : {$exists:true}}).sort(sort).toArray((err, docs) => {
-        assert.equal(err, null);
+
+    const News = mongoose.model('New');
+    News.find({archiveDate: {$exists: true}}, null, function (err, docs) {
         res.status(200).send(docs);
-    });
+    }).sort(sort);
 };
 
 const removeNew = (req, res, next) => {
     const id = req.params.newId;
-    var ObjectId = require('mongodb').ObjectID;
+    const ObjectId = require('mongodb').ObjectID;
+    const News = mongoose.model('New');
 
-    const collection = db.collection('news');
-    collection.deleteOne({ "_id": new ObjectId(id)}, (err, result) => {
-        assert.equal(err, null);
-        assert.equal(1, result.result.n);
-
+    News.deleteOne({"_id": new ObjectId(id)}, (err, result) => {
         res.status(204).send();
     });
 };
